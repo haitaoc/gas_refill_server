@@ -27,13 +27,16 @@ router.get('/:username/refuels', async (req: Request, res: Response) => {
     }
 });
 
-router.post('/:username/refuels', async (req: Request, res: Response) => {
-    const username = req.params.username;
+router.post('/:username/vehicles/:vehicleId/refuels', async (req: Request, res: Response) => {
+    const {
+        username,
+        vehicleId
+    } = req.params;
 
-    logger.info(`POST Refuel for user [${username}]`);
+    logger.info(`POST Refuel for user [${username}]'s vehicle [${vehicleId}]`);
     try {
         const jsonData = req.body;
-        let refuel = new Refuel(username, jsonData.vehicleId, jsonData.date, jsonData.gasPrice, jsonData.amountPaid, jsonData.curMileage);
+        let refuel = new Refuel(username, vehicleId, jsonData.date, jsonData.gasPrice, jsonData.amountPaid, jsonData.curMileage);
         
         const ret = await refuelDao.addOne(refuel);
 
