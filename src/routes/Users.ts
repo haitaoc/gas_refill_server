@@ -1,48 +1,25 @@
 import { Request, Response, Router } from 'express';
 import { BAD_REQUEST, CREATED, OK } from 'http-status-codes';
-import { ParamsDictionary } from 'express-serve-static-core';
-
-import UserDao from '@daos/User/UserDao.mock';
+import RefuelDao from '@daos/Refuel/RefuelDao';
 import logger from '@shared/Logger';
-import { paramMissingError } from '@shared/constants';
+import Refuel, { IRefuel } from '@entities/Refuel';
 
-// Init shared
 const router = Router();
-const userDao = new UserDao();
+const refuelDao = new RefuelDao();
 
+router.get('/:username/refuels', async (req: Request, res: Response) => {
+    const username = req.params.username;
 
-/******************************************************************************
- *                      Get All Users - "GET /api/users/all"
- ******************************************************************************/
+    logger.info(`GET Refuels for user [${username}]`);
 
-router.get('/all', async (req: Request, res: Response) => {
-    try {
-        const users = await userDao.getAll();
-        return res.status(OK).json({users});
-    } catch (err) {
-        logger.error(err.message, err);
-        return res.status(BAD_REQUEST).json({
-            error: err.message,
-        });
-    }
-});
+    try { 
+        const ret = await refuelDao.getAllForUser(username);
 
-
-/******************************************************************************
- *                       Add One - "POST /api/users/add"
- ******************************************************************************/
-
-router.post('/add', async (req: Request, res: Response) => {
-    try {
-        const { user } = req.body;
-        if (!user) {
-            return res.status(BAD_REQUEST).json({
-                error: paramMissingError,
-            });
+        if (ret === null) {
+            return res.status(BAD_REQUEST);
         }
-        await userDao.add(user);
-        return res.status(CREATED).end();
-    } catch (err) {
+        return res.status(OK).json(ret);
+    } catch(err) {
         logger.error(err.message, err);
         return res.status(BAD_REQUEST).json({
             error: err.message,
@@ -50,23 +27,21 @@ router.post('/add', async (req: Request, res: Response) => {
     }
 });
 
+router.post('/:username/refuels', async (req: Request, res: Response) => {
+    const username = req.params.username;
 
-/******************************************************************************
- *                       Update - "PUT /api/users/update"
- ******************************************************************************/
-
-router.put('/update', async (req: Request, res: Response) => {
+    logger.info(`POST Refuel for user [${username}]`);
     try {
-        const { user } = req.body;
-        if (!user) {
-            return res.status(BAD_REQUEST).json({
-                error: paramMissingError,
-            });
+        const jsonData = req.body;
+        let refuel = new Refuel(username, jsonData.vehicleId, jsonData.date, jsonData.gasPrice, jsonData.amountPaid, jsonData.curMileage);
+        
+        const ret = await refuelDao.addOne(refuel);
+
+        if (ret === null) {
+            return res.status(BAD_REQUEST);
         }
-        user.id = Number(user.id);
-        await userDao.update(user);
-        return res.status(OK).end();
-    } catch (err) {
+        return res.status(OK).json(ret);
+    } catch(err) {
         logger.error(err.message, err);
         return res.status(BAD_REQUEST).json({
             error: err.message,
@@ -74,27 +49,25 @@ router.put('/update', async (req: Request, res: Response) => {
     }
 });
 
+//router.put();
 
-/******************************************************************************
- *                    Delete - "DELETE /api/users/delete/:id"
- ******************************************************************************/
+router.delete('/:id', async (req: Request, res: Response) => {
+    logger.info("Handle POST Refuel request");
 
-router.delete('/delete/:id', async (req: Request, res: Response) => {
+    const id = req.params.id;
     try {
-        const { id } = req.params as ParamsDictionary;
-        await userDao.delete(Number(id));
-        return res.status(OK).end();
-    } catch (err) {
+        const ret = await refuelDao.deleteOne(id);
+
+        if (ret === null) {
+            return res.status(BAD_REQUEST);
+        }
+        return res.status(OK).json(ret);
+    } catch(err) {
         logger.error(err.message, err);
         return res.status(BAD_REQUEST).json({
             error: err.message,
         });
     }
 });
-
-
-/******************************************************************************
- *                                     Export
- ******************************************************************************/
 
 export default router;

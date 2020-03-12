@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import refuelRecordRouter from './Refuel';
+import userRouter from './Users';
 
 // Init router and path
 const router = Router();
 
 // Add sub-routes
 //router.use('/users', UserRouter);
-router.use('/refuels', refuelRecordRouter);
+router.use('/users', userRouter);
 
 router.get('/', () => {
     console.log("get root");
