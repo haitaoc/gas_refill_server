@@ -110,4 +110,4 @@ dist
 .vscode-test
 
 # Credential file
-config/Config.ts
+src/config/Config.ts

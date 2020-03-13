@@ -24,6 +24,9 @@
       ],
       "@server": [
         "src/Server"
+      ],
+      "@config/*": [
+        "src/config/*"
       ]
     },
     "types": [

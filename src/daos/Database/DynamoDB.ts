@@ -1,5 +1,5 @@
 import { DynamoDB } from 'aws-sdk/clients/all';
-import config from  'config/Config';
+import config from  '@config/Config';
 
 const {
     accessId,
