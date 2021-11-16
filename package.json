@@ -16,7 +16,7 @@
     "@server": "dist/Server"
   },
   "dependencies": {
-    "aws-sdk": "^2.624.0",
+    "aws-sdk": "^2.814.0",
     "command-line-args": "^5.1.1",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
